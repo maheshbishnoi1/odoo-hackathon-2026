@@ -381,7 +381,7 @@ public class ReportService {
     public TripStatisticsReportDTO getTripStatisticsReport() {
         log.debug("Generating Trip Statistics report");
 
-        List<Trip> trips = tripRepository.findAllByOrderByTripDateDesc();
+        List<Trip> trips = tripRepository.findAllByOrderByStartTimeDesc();
 
         Map<Long, BigDecimal> fuelMap = new HashMap<>();
         for (Object[] r : fuelRepository.aggregateFuelByTrip()) {

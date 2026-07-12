@@ -49,6 +49,16 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 
     /**
+     * Constructor with resource name and field value (assumes fieldName is "id").
+     */
+    public ResourceNotFoundException(String resourceName, Object fieldValue) {
+        super(String.format("%s not found with id : '%s'", resourceName, fieldValue));
+        this.resourceName = resourceName;
+        this.fieldName = "id";
+        this.fieldValue = fieldValue;
+    }
+
+    /**
      * Constructor with custom message.
      */
     public ResourceNotFoundException(String message) {
