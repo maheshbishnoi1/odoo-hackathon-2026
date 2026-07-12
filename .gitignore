@@ -1,0 +1,47 @@
+# =========================
+# Operating System
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# Backend (Spring Boot)
+# =========================
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+
+# =========================
+# Frontend (React + Vite)
+# =========================
+frontend/node_modules/
+frontend/dist/
+
+# Environment files
+.env
+*.env
+
+# =========================
+# Build Files
+# =========================
+out/
+build/
+
+# =========================
+# Temporary Files
+# =========================
+*.tmp
+*.swp
