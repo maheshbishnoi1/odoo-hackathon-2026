@@ -128,4 +128,28 @@ public interface FuelRepository
             GROUP BY f.trip.id, f.trip.tripNumber
             """)
     List<Object[]> aggregateFuelByTrip();
+
+    /**
+     * Aggregates monthly fuel cost for analytics cost trend report.
+     * Each row: [YEAR(f.fuelDate), MONTH(f.fuelDate), SUM(f.cost)].
+     */
+    @Query("""
+            SELECT YEAR(f.fuelDate), MONTH(f.fuelDate), SUM(f.cost)
+            FROM FuelLog f
+            GROUP BY YEAR(f.fuelDate), MONTH(f.fuelDate)
+            ORDER BY YEAR(f.fuelDate) ASC, MONTH(f.fuelDate) ASC
+            """)
+    List<Object[]> aggregateMonthlyFuelCost();
+
+    /**
+     * Aggregates fuel cost grouped by trip's driver for driver performance analytics.
+     * Each row: [driverId, SUM(f.cost)].
+     */
+    @Query("""
+            SELECT f.trip.driver.id, SUM(f.cost)
+            FROM FuelLog f
+            WHERE f.trip IS NOT NULL
+            GROUP BY f.trip.driver.id
+            """)
+    List<Object[]> aggregateFuelCostByDriver();
 }

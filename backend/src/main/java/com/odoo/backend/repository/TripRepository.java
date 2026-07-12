@@ -124,4 +124,46 @@ public interface TripRepository extends JpaRepository<Trip, Long>, JpaSpecificat
      * @return ordered list of trips
      */
     List<Trip> findAllByOrderByStartTimeDesc();
+
+    /**
+     * Returns most recent N trips for dashboard feed ordered by creation date descending.
+     * Uses Spring Data's Pageable for limiting.
+     */
+    org.springframework.data.domain.Page<Trip> findAllByOrderByCreatedAtDesc(
+            org.springframework.data.domain.Pageable pageable);
+
+    /**
+     * Aggregates trip counts and total distance per driver.
+     * Each row: [driverId, COUNT(t), SUM(t.distance), completedCount].
+     */
+    @org.springframework.data.jpa.repository.Query("""
+            SELECT t.driver.id, COUNT(t), SUM(t.distance),
+                   SUM(CASE WHEN t.status = 'COMPLETED' THEN 1 ELSE 0 END)
+            FROM Trip t
+            GROUP BY t.driver.id
+            """)
+    List<Object[]> aggregateTripStatsByDriver();
+
+    /**
+     * Returns trips for a given vehicle that were started within the last N days.
+     * Used for idle vehicle detection in fleet health analytics.
+     */
+    @org.springframework.data.jpa.repository.Query("""
+            SELECT t
+            FROM Trip t
+            WHERE t.vehicle.id = :vehicleId
+              AND t.startTime >= :since
+            ORDER BY t.startTime DESC
+            """)
+    List<Trip> findRecentTripsForVehicle(
+            @org.springframework.data.repository.query.Param("vehicleId") Long vehicleId,
+            @org.springframework.data.repository.query.Param("since") java.time.LocalDateTime since);
+
+    /**
+     * Counts trips for each status grouped.
+     * Each row: [TripStatus, count].
+     */
+    @org.springframework.data.jpa.repository.Query(
+            "SELECT t.status, COUNT(t) FROM Trip t GROUP BY t.status")
+    List<Object[]> countTripsGroupedByStatus();
 }

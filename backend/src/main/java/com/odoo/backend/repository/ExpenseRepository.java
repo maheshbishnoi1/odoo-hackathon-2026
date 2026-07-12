@@ -123,4 +123,28 @@ public interface ExpenseRepository
             GROUP BY e.trip.id, e.trip.tripNumber
             """)
     List<Object[]> aggregateExpenseByTrip();
+
+    /**
+     * Aggregates monthly expense cost for analytics cost trend report.
+     * Each row: [YEAR(e.expenseDate), MONTH(e.expenseDate), SUM(e.amount)].
+     */
+    @Query("""
+            SELECT YEAR(e.expenseDate), MONTH(e.expenseDate), SUM(e.amount)
+            FROM Expense e
+            GROUP BY YEAR(e.expenseDate), MONTH(e.expenseDate)
+            ORDER BY YEAR(e.expenseDate) ASC, MONTH(e.expenseDate) ASC
+            """)
+    List<Object[]> aggregateMonthlyExpenseCost();
+
+    /**
+     * Aggregates expense cost grouped by trip's driver for driver performance analytics.
+     * Each row: [driverId, SUM(e.amount)].
+     */
+    @Query("""
+            SELECT e.trip.driver.id, SUM(e.amount)
+            FROM Expense e
+            WHERE e.trip IS NOT NULL
+            GROUP BY e.trip.driver.id
+            """)
+    List<Object[]> aggregateExpenseCostByDriver();
 }

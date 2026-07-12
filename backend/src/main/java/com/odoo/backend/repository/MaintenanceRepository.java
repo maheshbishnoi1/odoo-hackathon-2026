@@ -21,6 +21,9 @@ public interface MaintenanceRepository
         extends JpaRepository<MaintenanceRecord, Long>,
                 JpaSpecificationExecutor<MaintenanceRecord> {
 
+    /** Count maintenance records by status — used by DashboardService. */
+    long countByStatus(com.odoo.backend.enums.MaintenanceStatus status);
+
     /**
      * Finds all maintenance records for a given vehicle, ordered by start date descending.
      *
@@ -91,4 +94,42 @@ public interface MaintenanceRepository
      */
     @Query("SELECT COUNT(m) FROM MaintenanceRecord m WHERE m.status IN ('OPEN', 'IN_PROGRESS')")
     long countActiveMaintenanceRecords();
+
+    /**
+     * Finds all active (OPEN or IN_PROGRESS) maintenance records for dashboard alerts.
+     * Returns [vehicleId, registrationNumber, maintenanceType, status, startDate, estimatedCost].
+     */
+    @Query("""
+            SELECT m.vehicle.id, m.vehicle.registrationNumber,
+                   m.maintenanceType, m.status, m.startDate, m.estimatedCost
+            FROM MaintenanceRecord m
+            WHERE m.status IN ('OPEN', 'IN_PROGRESS')
+            ORDER BY m.startDate ASC
+            """)
+    List<Object[]> findActiveMaintenanceForDashboard();
+
+    /**
+     * Aggregates monthly maintenance actual cost for analytics cost trend report.
+     * Each row: [YEAR(m.startDate), MONTH(m.startDate), SUM(m.actualCost)].
+     */
+    @Query("""
+            SELECT YEAR(m.startDate), MONTH(m.startDate), SUM(m.actualCost)
+            FROM MaintenanceRecord m
+            WHERE m.actualCost IS NOT NULL
+            GROUP BY YEAR(m.startDate), MONTH(m.startDate)
+            ORDER BY YEAR(m.startDate) ASC, MONTH(m.startDate) ASC
+            """)
+    List<Object[]> aggregateMonthlyMaintenanceCost();
+
+    /**
+     * Finds active maintenance records by vehicle ID (for fleet health alerts).
+     */
+    @Query("""
+            SELECT m
+            FROM MaintenanceRecord m
+            WHERE m.vehicle.id = :vehicleId
+              AND m.status IN ('OPEN', 'IN_PROGRESS')
+            ORDER BY m.startDate DESC
+            """)
+    List<MaintenanceRecord> findActiveByVehicleId(@Param("vehicleId") Long vehicleId);
 }
