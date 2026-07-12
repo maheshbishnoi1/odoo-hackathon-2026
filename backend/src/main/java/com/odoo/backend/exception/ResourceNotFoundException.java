@@ -1,27 +1,62 @@
 package com.odoo.backend.exception;
 
+import lombok.Getter;
+
 /**
- * Thrown when a requested resource is not found in the database.
- * Maps to HTTP 404 in {@link com.odoo.backend.exception.GlobalExceptionHandler}.
+ * Base exception thrown when a requested resource
+ * does not exist in the system.
+ *
+ * Examples:
+ * - User not found
+ * - Vehicle not found
+ * - Driver not found
+ * - Trip not found
+ * - Maintenance record not found
  */
+@Getter
 public class ResourceNotFoundException extends RuntimeException {
 
+    private final String resourceName;
+    private final String fieldName;
+    private final Object fieldValue;
+
     /**
-     * Constructs the exception with a descriptive message.
+     * Constructor with detailed information.
      *
-     * @param message the detail message
+     * Example:
+     * throw new ResourceNotFoundException(
+     *      "Vehicle",
+     *      "id",
+     *      5L
+     * );
+     */
+    public ResourceNotFoundException(
+            String resourceName,
+            String fieldName,
+            Object fieldValue
+    ) {
+
+        super(String.format(
+                "%s not found with %s : '%s'",
+                resourceName,
+                fieldName,
+                fieldValue
+        ));
+
+        this.resourceName = resourceName;
+        this.fieldName = fieldName;
+        this.fieldValue = fieldValue;
+    }
+
+    /**
+     * Constructor with custom message.
      */
     public ResourceNotFoundException(String message) {
         super(message);
+
+        this.resourceName = null;
+        this.fieldName = null;
+        this.fieldValue = null;
     }
 
-    /**
-     * Convenience constructor for entity-by-ID lookups.
-     *
-     * @param entityName the entity class name (e.g., "MaintenanceRecord")
-     * @param id         the ID that was not found
-     */
-    public ResourceNotFoundException(String entityName, Long id) {
-        super(entityName + " not found with id: " + id);
-    }
 }

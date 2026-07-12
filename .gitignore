@@ -45,3 +45,5 @@ build/
 # =========================
 *.tmp
 *.swp
+
+**/application.properties
