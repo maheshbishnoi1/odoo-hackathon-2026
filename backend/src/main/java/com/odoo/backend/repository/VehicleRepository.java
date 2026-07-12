@@ -6,6 +6,7 @@ import com.odoo.backend.enums.VehicleType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
  */
 
 @Repository
-public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
+public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpecificationExecutor<Vehicle> {
 
     // =========================================================================
     // Registration Number
@@ -31,11 +32,17 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     /**
      * Checks whether a registration number already exists.
+     *
+     * @param registrationNumber the plate number
+     * @return {@code true} if exists
      */
     boolean existsByRegistrationNumber(String registrationNumber);
 
     /**
      * Finds vehicle by registration number.
+     *
+     * @param registrationNumber the plate number
+     * @return an {@link Optional} containing the vehicle, or empty if not found
      */
     Optional<Vehicle> findByRegistrationNumber(String registrationNumber);
 
@@ -45,6 +52,9 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     /**
      * Finds all vehicles by status.
+     *
+     * @param status the vehicle status to filter by
+     * @return list of vehicles with that status
      */
     List<Vehicle> findByStatus(VehicleStatus status);
 
@@ -103,11 +113,19 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     );
 
     // =========================================================================
-    // Dashboard
+    // Dashboard / Reporting
     // =========================================================================
 
     long countByStatus(VehicleStatus status);
 
     long countByVehicleType(VehicleType vehicleType);
 
+    /**
+     * Counts vehicles grouped by operational status.
+     * Each element: [VehicleStatus, Long count].
+     *
+     * @return list of status counts
+     */
+    @Query("SELECT v.status, COUNT(v) FROM Vehicle v GROUP BY v.status")
+    List<Object[]> countVehiclesGroupedByStatus();
 }

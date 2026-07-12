@@ -5,6 +5,7 @@ import com.odoo.backend.entity.Trip;
 import com.odoo.backend.entity.Vehicle;
 import com.odoo.backend.enums.TripStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Optional;
  *
  * Repository interface for Trip entity.
  *
- * Provides CRUD operations and custom queries.
+ * Provides CRUD operations, specifications, and custom queries.
  *
  * Business Rules:
  * • Trip Number must be unique.
@@ -28,7 +29,7 @@ import java.util.Optional;
  */
 
 @Repository
-public interface TripRepository extends JpaRepository<Trip, Long> {
+public interface TripRepository extends JpaRepository<Trip, Long>, JpaSpecificationExecutor<Trip> {
 
     /**
      * Find trip by trip number.
@@ -109,4 +110,18 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
      */
     List<Trip> findAllByOrderByCreatedAtDesc();
 
+    /**
+     * Returns all trips associated with a given vehicle ordered by start time desc.
+     *
+     * @param vehicleId the vehicle primary key
+     * @return list of trips for that vehicle
+     */
+    List<Trip> findByVehicle_IdOrderByStartTimeDesc(Long vehicleId);
+
+    /**
+     * Returns all trips ordered by start time descending.
+     *
+     * @return ordered list of trips
+     */
+    List<Trip> findAllByOrderByStartTimeDesc();
 }

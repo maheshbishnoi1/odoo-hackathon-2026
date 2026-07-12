@@ -45,6 +45,8 @@ public enum VehicleStatus {
 
     IN_SHOP("In Shop"),
 
+    UNDER_REPAIR("Under Repair"),
+
     RETIRED("Retired");
 
     /**
@@ -80,7 +82,7 @@ public enum VehicleStatus {
      * it is not currently on a trip.
      */
     public boolean canGoToMaintenance() {
-        return this == AVAILABLE;
+        return this == AVAILABLE || this == UNDER_REPAIR;
     }
 
     /**

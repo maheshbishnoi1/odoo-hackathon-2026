@@ -21,22 +21,6 @@ import java.time.LocalDateTime;
  * • Vehicle Status defaults to AVAILABLE.
  * • Capacity must be greater than zero.
  * • Odometer cannot be negative.
- * * Lifecycle:
- * AVAILABLE
- *      ↓
- * ON_TRIP
- *      ↓
- * AVAILABLE
- *
- * AVAILABLE
- *      ↓
- * IN_SHOP
- *      ↓
- * AVAILABLE
- *
- * AVAILABLE
- *      ↓
- * RETIRED
  *
  * ============================================================================
  */
@@ -45,12 +29,9 @@ import java.time.LocalDateTime;
 @Table(
         name = "vehicles",
         indexes = {
-                @Index(name = "idx_vehicle_registration",
-                        columnList = "registrationNumber"),
-                @Index(name = "idx_vehicle_status",
-                        columnList = "status"),
-                @Index(name = "idx_vehicle_type",
-                        columnList = "vehicleType")
+                @Index(name = "idx_vehicle_registration", columnList = "registrationNumber"),
+                @Index(name = "idx_vehicle_status", columnList = "status"),
+                @Index(name = "idx_vehicle_type", columnList = "vehicleType")
         }
 )
 @Getter
@@ -77,7 +58,7 @@ public class Vehicle {
     @NotBlank(message = "Registration number is required")
     @Size(max = 30)
     @EqualsAndHashCode.Include
-    @Column(nullable = false, unique = true, length = 30)
+    @Column(name = "registration_number", nullable = false, unique = true, length = 30)
     private String registrationNumber;
 
     @NotBlank(message = "Vehicle name is required")
@@ -116,6 +97,16 @@ public class Vehicle {
     @Size(max = 30)
     private String color;
 
+    // Additional fields from Maintenance/Fuel/Expense stub
+    @Column(name = "make", length = 100)
+    private String make;
+
+    @Column(name = "model", length = 100)
+    private String model;
+
+    @Column(name = "year")
+    private Integer year;
+
     // =========================================================================
     // DOCUMENTS
     // =========================================================================
@@ -141,6 +132,23 @@ public class Vehicle {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    // ---- Bidirectional JPA Relationships (Lazy Loaded) ----
+
+    /** Maintenance records associated with this vehicle. */
+    @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY)
+    @Builder.Default
+    private java.util.List<MaintenanceRecord> maintenanceRecords = new java.util.ArrayList<>();
+
+    /** Fuel logs associated with this vehicle. */
+    @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY)
+    @Builder.Default
+    private java.util.List<FuelLog> fuelLogs = new java.util.ArrayList<>();
+
+    /** Expenses associated with this vehicle. */
+    @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY)
+    @Builder.Default
+    private java.util.List<Expense> expenses = new java.util.ArrayList<>();
 
     // =========================================================================
     // JPA LIFECYCLE CALLBACKS

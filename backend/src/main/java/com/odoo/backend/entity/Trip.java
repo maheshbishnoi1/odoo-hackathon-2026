@@ -171,6 +171,18 @@ public class Trip {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // ---- Bidirectional JPA Relationships (Lazy Loaded) ----
+
+    /** Fuel logs associated with this trip. */
+    @OneToMany(mappedBy = "trip", fetch = FetchType.LAZY)
+    @Builder.Default
+    private java.util.List<FuelLog> fuelLogs = new java.util.ArrayList<>();
+
+    /** Expenses associated with this trip. */
+    @OneToMany(mappedBy = "trip", fetch = FetchType.LAZY)
+    @Builder.Default
+    private java.util.List<Expense> expenses = new java.util.ArrayList<>();
+
     /**
      * Automatically executed before insert.
      */
