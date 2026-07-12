@@ -1,9 +1,23 @@
 package com.odoo.backend.exception;
 
-public class TripNotFoundException extends ResourceNotFoundException {
+/**
+ * ============================================================================
+ * Trip Not Found Exception
+ * ============================================================================
+ *
+ * Thrown when a requested Trip cannot be found.
+ *
+ * ============================================================================
+ */
+public class TripNotFoundException extends RuntimeException {
 
-    public TripNotFoundException(Long id) {
-        super("Trip", "id", id);
+    /**
+     * Constructs a new TripNotFoundException.
+     *
+     * @param message Exception message.
+     */
+    public TripNotFoundException(String message) {
+        super(message);
     }
 
 }
